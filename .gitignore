@@ -1,0 +1,14 @@
+# .NET
+Backend/bin/
+Backend/obj/
+
+# Visual Studio
+.vs/
+
+# Environment
+*.env
+
+# OS
+Thumbs.db
+Desktop.ini
+.DS_Store
