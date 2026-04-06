@@ -13,10 +13,17 @@ public class MongoDbService
         var database = client.GetDatabase(config["MongoDB:DatabaseName"]);
         _users = database.GetCollection<User>("Users");
 
-        // Create unique index on Email
-        var indexKeys = Builders<User>.IndexKeys.Ascending(u => u.Email);
-        var indexOptions = new CreateIndexOptions { Unique = true };
-        _users.Indexes.CreateOne(new CreateIndexModel<User>(indexKeys, indexOptions));
+        var indexModels = new[]
+        {
+            // Unique index on email — prevents duplicate accounts, speeds up login lookups
+            new CreateIndexModel<User>(
+                Builders<User>.IndexKeys.Ascending("email"),
+                new CreateIndexOptions { Unique = true }),
+            // Index on role — speeds up role-based queries (e.g. list all admins)
+            new CreateIndexModel<User>(
+                Builders<User>.IndexKeys.Ascending("role")),
+        };
+        _users.Indexes.CreateMany(indexModels);
     }
 
     public async Task<User?> GetUserByEmailAsync(string email) =>
